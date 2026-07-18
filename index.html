@@ -474,9 +474,17 @@
 
             try {
                 bluetoothDevice = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: KNOWN_BMS_SERVICES
-                });
+                            filters: [
+          { namePrefix: 'JBD' },
+          { namePrefix: 'JK' },
+          { namePrefix: 'DALY' },
+          { namePrefix: 'DL' },
+          { namePrefix: 'BLE' },
+          { namePrefix: 'Smart' }
+        ],
+        optionalServices: KNOWN_BMS_SERVICES
+      });
+
 
                 logMessage(`Target paired: "${bluetoothDevice.name || 'Unnamed Peripheral'}"`);
                 bluetoothDevice.addEventListener('gattserverdisconnected', onDeviceDisconnected);
