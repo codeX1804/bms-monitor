@@ -447,13 +447,21 @@
     const consoleBox = document.getElementById('consoleLog');
 
     function logMessage(text) {
-        const time = new Date().toLocaleTimeString();
-        const line = document.createElement('div');
-        line.className = 'console-line';
-        line.innerText = `[${time}] ${text}`;
-        consoleBox.appendChild(line);
-        consoleBox.scrollTop = consoleBox.scrollHeight;
-    }
+    const time = new Date().toLocaleTimeString();
+    const formattedLog = `[${time}] ${text}`;
+    
+    const line = document.createElement('div');
+    line.className = 'console-line';
+    line.innerText = formattedLog;
+    consoleBox.appendChild(line);
+    consoleBox.scrollTop = consoleBox.scrollHeight;
+    
+    let savedLogs = JSON.parse(localStorage.getItem('bms_debug_logs')) || [];
+    savedLogs.push(formattedLog);
+    if (savedLogs.length > 500) savedLogs.shift(); 
+    localStorage.setItem('bms_debug_logs', JSON.stringify(savedLogs));
+}
+
 
     if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
         logMessage("SECURITY ERROR: Web Bluetooth requires an HTTPS environment. Run on live deployment server.");
