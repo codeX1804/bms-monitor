@@ -476,14 +476,23 @@
 
             try {
                 bluetoothDevice = await navigator.bluetooth.requestDevice({
-                            filters: [
-          { namePrefix: 'JBD' },
-          { namePrefix: 'JK' },
-          { namePrefix: 'DALY' },
-          { namePrefix: 'DL' },
-          { namePrefix: 'BLE' },
-          { namePrefix: 'Smart' }
-        ],
+                                                filters: [
+                        { namePrefix: 'JBD' },
+                        { namePrefix: 'JK' },
+                        { namePrefix: 'DALY' },
+                        { namePrefix: 'DL' },
+                        { namePrefix: 'BLE' },
+                        { namePrefix: 'Smart' },
+                        { namePrefix: 'BMS' },
+                        { namePrefix: 'BT-' },
+                        { namePrefix: 'ANT' },
+                        { namePrefix: 'Hi' },
+                        { namePrefix: 'HM-' },
+                        { namePrefix: 'JDY' },
+                        { namePrefix: 'MATE' },
+                        { namePrefix: 'LY-' }
+                    ],
+                    
         optionalServices: KNOWN_BMS_SERVICES
       });
 
