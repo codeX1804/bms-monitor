@@ -423,6 +423,10 @@
             </div>
         </div>
 
+        <button id="viewLogsBtn" style="width: 100%; margin: 10px 0; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold;">
+    View Saved Debug Logs
+        </button>
+        
         <!-- BIGGER, EXPANDED TERMINAL VIEW -->
         <div class="console-card" id="consoleLog">
             <div class="console-line">SYSTEM STATUS: Terminal Initialized. Ready to scan hardware layers...</div>
@@ -438,11 +442,28 @@
     
     // Core BMS Target Service Profiles
     const KNOWN_BMS_SERVICES = [
-        '0000ffe0-0000-1000-8000-00805f9b34fb', // JBD / Jiabaida Service 
-        '0000fff0-0000-1000-8000-00805f9b34fb', // Daly BMS Service
-        '0000ff00-0000-1000-8000-00805f9b34fb', // JK Active Balancing Module Service
-        '0000180f-0000-1000-8000-00805f9b34fb'  // Generic GATT Battery Profile
-    ];
+    // --- Standard BMS Protocols ---
+    '0000ffe0-0000-1000-8000-00805f9b34fb', // JBD / Jiabaida / HM-10 Serial
+    '0000fff0-0000-1000-8000-00805f9b34fb', // Daly BMS
+    '0000ff00-0000-1000-8000-00805f9b34fb', // JK BMS / NEEY Active Balancers
+    '0000180f-0000-1000-8000-00805f9b34fb', // Standard GATT Battery Profile
+    '6e400001-b5a3-f393-e0a9-e50e24dcca9e', // Nordic UART Service (nRF52)
+    '00001688-0000-1000-8000-00805f9b34fb', // ANT BMS
+
+    // --- Extended Generic Pass-Through & Custom BMS ---
+    '0000fee0-0000-1000-8000-00805f9b34fb', // Telink BLE
+    '0000feb0-0000-1000-8000-00805f9b34fb', // Microchip / Custom BLE Pass-through
+    '0000e781-0000-1000-8000-00805f9b34fb', // TI CC254x Serial
+    '0000fe00-0000-1000-8000-00805f9b34fb', // Silabs SPP
+    '4880c12c-fdcb-4077-8920-a450d7f9b907', // Silabs Custom
+
+    // --- Enterprise & Industrial Brands ---
+    '0000f000-0000-1000-8000-00805f9b34fb', // Seplos BMS
+    '0000ffd0-0000-1000-8000-00805f9b34fb', // PaceEx BMS
+    '0000ffbe-0000-1000-8000-00805f9b34fb', // Heltec Balancers
+    '0000ff12-0000-1000-8000-00805f9b34fb'  // Renogy Smart BMS
+];
+    
 
     const consoleBox = document.getElementById('consoleLog');
 
@@ -461,7 +482,15 @@
     if (savedLogs.length > 500) savedLogs.shift(); 
     localStorage.setItem('bms_debug_logs', JSON.stringify(savedLogs));
 }
-
+ document.getElementById('viewLogsBtn').addEventListener('click', () => {
+    const logs = JSON.parse(localStorage.getItem('bms_debug_logs')) || [];
+    if (logs.length === 0) {
+        alert("No saved logs found yet. Run a scan first!");
+    } else {
+        alert(logs.join('\n'));
+    }
+});
+    
 
     if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
         logMessage("SECURITY ERROR: Web Bluetooth requires an HTTPS environment. Run on live deployment server.");
@@ -485,21 +514,44 @@
             try {
                 bluetoothDevice = await navigator.bluetooth.requestDevice({
                                                 filters: [
-                        { namePrefix: 'JBD' },
-                        { namePrefix: 'JK' },
-                        { namePrefix: 'DALY' },
-                        { namePrefix: 'DL' },
-                        { namePrefix: 'BLE' },
-                        { namePrefix: 'Smart' },
-                        { namePrefix: 'BMS' },
-                        { namePrefix: 'BT-' },
-                        { namePrefix: 'ANT' },
-                        { namePrefix: 'Hi' },
-                        { namePrefix: 'HM-' },
-                        { namePrefix: 'JDY' },
-                        { namePrefix: 'MATE' },
-                        { namePrefix: 'LY-' }
-                    ],
+    // --- Major BMS Brands ---
+    { namePrefix: 'JBD' },
+    { namePrefix: 'JK' },
+    { namePrefix: 'DALY' },
+    { namePrefix: 'DL' },
+    { namePrefix: 'ANT' },
+    { namePrefix: 'Seplos' },
+    { namePrefix: 'NEEY' },
+    { namePrefix: 'Pace' },
+    { namePrefix: 'Heltec' },
+    { namePrefix: 'Overkill' },
+    { namePrefix: 'Xiaoxiang' },
+
+    // --- Generic BLE & Serial Pass-Through Modules ---
+    { namePrefix: 'HM-' },
+    { namePrefix: 'JDY' },
+    { namePrefix: 'AT-' },
+    { namePrefix: 'HC-' },
+    { namePrefix: 'MLT-' },
+    { namePrefix: 'DX-' },
+    { namePrefix: 'CC254' },
+    { namePrefix: 'CC41' },
+    { namePrefix: 'nRF' },
+    { namePrefix: 'SPP' },
+
+    // --- White-Label & Universal Prefixes ---
+    { namePrefix: 'BLE' },
+    { namePrefix: 'Smart' },
+    { namePrefix: 'BMS' },
+    { namePrefix: 'BT-' },
+    { namePrefix: 'Hi' },
+    { namePrefix: 'MATE' },
+    { namePrefix: 'LY-' },
+    { namePrefix: 'BAT' },
+    { namePrefix: 'LFP' },
+    { namePrefix: 'EV-' }
+],
+                                                    
                     
         optionalServices: KNOWN_BMS_SERVICES
       });
